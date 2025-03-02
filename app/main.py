@@ -29,10 +29,12 @@ load_dotenv()
 async def parse(request: Request, parse_request: ParseRequest) -> ParseResponse:
     if len(parse_request.prompt) < PROMPT_MIN_LENGTH:
         raise HTTPException(
-            status_code=400, detail=f"prompt must be at least{PROMPT_MIN_LENGTH}"
+            status_code=400,
+            detail=f"prompt must be at least {PROMPT_MIN_LENGTH} characters long",
         )
     if len(parse_request.prompt) > PROMPT_MAX_LENGTH:
         raise HTTPException(
-            status_code=400, detail=f"prompt must be at most {PROMPT_MAX_LENGTH}"
+            status_code=400,
+            detail=f"prompt must be at most {PROMPT_MAX_LENGTH} characters long",
         )
     return parse_using_ai(parse_request=parse_request)
