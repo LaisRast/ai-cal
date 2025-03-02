@@ -30,7 +30,7 @@ def create_structured_extractor() -> callable:
 def parse_using_ai(parse_request: ParseRequest) -> ParseResponse:
     structured_extractor = create_structured_extractor()
     ai_cal_event: AiCalEvent = structured_extractor.invoke(
-        {"input": parse_request.prompt}
+        {"input": parse_request.prompt.strip()}
     )
 
     cal = Calendar()
