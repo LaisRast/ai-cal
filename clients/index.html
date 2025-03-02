@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AiCal</title>
+    <meta name="description"
+          content="Create personalized .ics calendar files effortlessly with AiCal. Input your event details and generate downloadable calendar entries instantly.">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+    <script defer src="https://umami.rastanawi.com/script.js" data-website-id="ed6481eb-5660-43d0-b429-b3fc7f8cd1c6"></script>
+    <style>
+        html, body {
+            height: 100dvh;
+        }
+
+        body > footer {
+            position: sticky;
+            top: 100vh;
+        }
+
+        pre {
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>AiCal</h1>
+    <span>Prompt to .ics file</span>
+</header>
+<main>
+    <section id="inputSection">
+            <textarea id="promptTextArea"
+                      rows="10"
+                      aria-describedby="promptValidationHelper"
+                      onkeyup="validatePrompt()"
+                      placeholder="Enter your prompt here..."></textarea>
+        <small id="promptValidationHelper">&nbsp</small>
+        <button id="generateButton" onclick="sendPrompt()" disabled>Generate .ics</button>
+        <div>
+            <small id="errorMessage" style="color: red"></small>
+        </div>
+    </section>
+    <section id="outputSection" hidden="hidden">
+        <pre id="responsePre">XXX</pre>
+        <button onclick="downloadICS()">Download .ics</button>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 AiCal. All rights reserved.</p>
+    <a target="_blank" referrerpolicy="no-referrer" href="https://github.com/LaisRast/ai-cal">Github</a>
+</footer>
+
+<script>
+  async function sendPrompt() {
+    const generateButton = document.getElementById('generateButton');
+    const promptTextArea = document.getElementById('promptTextArea');
+    const responsePre = document.getElementById('responsePre');
+    const errorMessage = document.getElementById("errorMessage")
+    const outputSection = document.getElementById("outputSection")
+
+    generateButton.disabled = true;
+    generateButton.ariaBusy = "true";
+
+    try {
+      outputSection.setAttribute("hidden", "hidden")
+      errorMessage.innerText = ""
+      const response = await fetch('https://ai-cal.xyz/api/parse', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({prompt: promptTextArea.value})
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        outputSection.removeAttribute("hidden");
+        responsePre.innerHTML = data.ics || 'No ICS content received';
+      } else {
+        const errorData = await response.json();
+        errorMessage.innerText = 'Error: ' + (errorData.detail || errorData.error || 'Unknown error');
+      }
+    } catch (error) {
+      errorMessage.innerText = 'Error: ' + error.message;
+    } finally {
+      generateButton.disabled = false;
+      generateButton.ariaBusy = "false";
+    }
+  }
+
+  function downloadICS() {
+    const responsePre = document.getElementById('responsePre').value;
+    const blob = new Blob([responsePre], {type: 'text/calendar'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'event.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function validatePrompt() {
+    const promptTextArea = document.getElementById('promptTextArea');
+    const promptValidationHelper = document.getElementById("promptValidationHelper")
+    const generateButton = document.getElementById('generateButton');
+    if (promptTextArea.value.length < 20) {
+      promptTextArea.ariaInvalid = "true"
+      promptValidationHelper.innerHTML = "Input value must be at least 20 character length"
+      generateButton.disabled = true
+    } else if (promptTextArea.value.length > 400) {
+      promptTextArea.ariaInvalid = "true"
+      promptValidationHelper.innerHTML = "Input value must be at most 400 character length"
+      generateButton.disabled = true
+    } else {
+      promptTextArea.ariaInvalid = "false"
+      promptValidationHelper.innerHTML = "&nbsp"
+      generateButton.disabled = false
+    }
+  }
+</script>
+</body>
+</html>
