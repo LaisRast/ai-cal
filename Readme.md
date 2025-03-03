@@ -2,9 +2,35 @@
 
 AiCal is an application that converts user prompts into `.ics` calendar files using AI.
 
-## Demo
+## Clients
 
-Try AiCal online at [www.ai-cal.xyz](https://www.ai-cal.xyz).
+Below you can find two options to access AiCal.
+
+### Web page
+
+A web page can be found in `clients/index.html`.
+The web page is deploy at [www.ai-cal.xyz](https://www.ai-cal.xyz).
+
+| Light                                           | Dark                                           |
+|-------------------------------------------------|------------------------------------------------|
+| <img src="assets/ai-cal_light.jpg" width="200"> | <img src="assets/ai-cal_dark.jpg" width="200"> |
+
+### Shell script
+
+A shell script can be found in `clients/ai-cal.sh`.
+
+```bash
+# Usage: ai-cal.sh [options] [prompt]
+# Options:
+#   -h  Display this help message
+#   -o FILE  Save the 'ics' content to the specified FILE
+```
+Example of usage:
+```
+ai-cal.sh                        # input prompt interactively
+ai-cal.sh "event prompt"         # prompt as an argument
+cat event_prompt | ai-cal.sh     # prompt from standard input
+```
 
 ## Setup
 
